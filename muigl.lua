@@ -1,9 +1,7 @@
 --[[
-    Script Hack Roblox - Menu 3 Ngón Tay
+    Script Hack Roblox - Menu 3 Ngón Tay (Đã sửa lỗi)
+    Hiển thị thông báo khi script chạy thành công.
     Yêu cầu key: "khanhhuy"
-    Tính năng: ESP (box siêu đẹp, line, name, máu), Aimbot Silent 100% đầu,
-    giao diện bo góc mịn, chạm 3 ngón để mở/tắt menu, chạm ngoài menu ẩn.
-    Hỗ trợ mọi game.
     palofsc
 --]]
 
@@ -14,28 +12,24 @@ local TweenService = game:GetService("TweenService")
 local LocalPlayer = Players.LocalPlayer
 local Camera = workspace.CurrentCamera
 
--- ===== CÀI ĐẶT HACK =====
-local Hack = {
-    ESP = false,
-    ESPBox = true,
-    ESPLine = true,
-    ESPName = true,
-    ESPHealth = true,
-    ESPCount = 0,           -- sẽ cập nhật
-    Aimbot = false,
-    SilentAim = true,       -- mặc định bật silent aim
-    AimPart = "Head",
-    Smoothness = 0.2,
-    FOV = 300,
-    TeamCheck = false,
-    VisibleCheck = true
-}
+-- ===== ĐẢM BẢO LOCALPLAYER SẴN SÀNG =====
+repeat wait() until LocalPlayer
+repeat wait() until LocalPlayer:WaitForChild("PlayerGui")
+
+-- ===== IN RA CONSOLE (DÙNG HÀM print) =====
+print("=======================================")
+print("   Script đã chạy thành công!          ")
+print("   Key mặc định: khanhhuy              ")
+print("   Nhập key để mở menu.               ")
+print("   Sau khi key đúng, chạm 3 ngón       ")
+print("   để mở/tắt menu.                     ")
+print("=======================================")
 
 -- ===== HỆ THỐNG KEY =====
 local KeyScreen = Instance.new("ScreenGui")
 KeyScreen.Name = "KeyGUI"
 KeyScreen.ResetOnSpawn = false
-KeyScreen.Parent = LocalPlayer:WaitForChild("PlayerGui")
+KeyScreen.Parent = LocalPlayer.PlayerGui
 
 local KeyFrame = Instance.new("Frame")
 KeyFrame.Size = UDim2.new(0,300,0,180)
@@ -93,6 +87,7 @@ KeySubmit.MouseButton1Click:Connect(function()
     if KeyInput.Text == "khanhhuy" then
         KeyStatus.Text = "✅ Key đúng! Đang mở menu..."
         KeyStatus.TextColor3 = Color3.fromRGB(0,255,0)
+        print("Key đúng! Menu đã sẵn sàng. Chạm 3 ngón để mở menu.")
         wait(0.8)
         KeyScreen:Destroy()
         -- Khởi tạo menu chính sau khi key đúng
@@ -100,9 +95,27 @@ KeySubmit.MouseButton1Click:Connect(function()
     else
         KeyStatus.Text = "❌ Sai key! Vui lòng thử lại."
         KeyStatus.TextColor3 = Color3.fromRGB(255,80,80)
+        print("Key sai! Người dùng đã nhập: " .. KeyInput.Text)
         KeyInput.Text = ""
     end
 end)
+
+-- ===== CÀI ĐẶT HACK =====
+local Hack = {
+    ESP = false,
+    ESPBox = true,
+    ESPLine = true,
+    ESPName = true,
+    ESPHealth = true,
+    ESPCount = 0,
+    Aimbot = false,
+    SilentAim = true,
+    AimPart = "Head",
+    Smoothness = 0.2,
+    FOV = 300,
+    TeamCheck = false,
+    VisibleCheck = true
+}
 
 -- ===== MENU CHÍNH =====
 local MainGui = nil
@@ -113,7 +126,7 @@ function InitMainMenu()
     MainGui = Instance.new("ScreenGui")
     MainGui.Name = "HackMenu"
     MainGui.ResetOnSpawn = false
-    MainGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+    MainGui.Parent = LocalPlayer.PlayerGui
 
     -- Nền tối toàn màn hình để chạm ngoài ẩn menu
     local BackgroundOverlay = Instance.new("TextButton")
@@ -327,6 +340,8 @@ function InitMainMenu()
             touchCount = math.max(0, touchCount - 1)
         end
     end)
+    
+    print("Menu đã sẵn sàng. Chạm 3 ngón để mở menu.")
 end
 
 -- ===== ESP THỰC THI =====
@@ -380,7 +395,7 @@ local function CreateESP()
         local boxX = headPos.X - boxWidth/2
         local boxY = headPos.Y
 
-        -- Box siêu đẹp (viền ngoài + nền mờ)
+        -- Box siêu đẹp
         if Hack.ESPBox then
             local boxOutline = Drawing.new("Square")
             boxOutline.Position = Vector2.new(boxX, boxY)
@@ -419,7 +434,7 @@ local function CreateESP()
             nameText.Text = player.Name
             nameText.Position = Vector2.new(headPos.X, boxY - 20)
             nameText.Size = 14
-            nameText.Font = 2 -- Drawing.Fonts.Monospace
+            nameText.Font = 2
             nameText.Color = Color3.fromRGB(255,255,255)
             nameText.Center = true
             nameText.Outline = true
@@ -427,7 +442,7 @@ local function CreateESP()
             table.insert(ESP_Objects, nameText)
         end
 
-        -- Máu (thanh bar)
+        -- Máu
         if Hack.ESPHealth then
             local barWidth = 3
             local barHeight = boxHeight
@@ -445,7 +460,7 @@ local function CreateESP()
             local barFill = Drawing.new("Square")
             barFill.Position = Vector2.new(barX, barY + (1-healthPercent)*barHeight)
             barFill.Size = Vector2.new(barWidth, healthPercent * barHeight)
-            barFill.Color = Color3.fromHSV(healthPercent * 0.3, 1, 1) -- xanh -> đỏ
+            barFill.Color = Color3.fromHSV(healthPercent * 0.3, 1, 1)
             barFill.Filled = true
             barFill.Visible = true
             table.insert(ESP_Objects, barFill)
@@ -456,7 +471,7 @@ local function CreateESP()
     end
 end
 
--- ===== AIMBOT (Silent + 100% đầu) =====
+-- ===== AIMBOT =====
 local function AimbotFunction()
     if not Hack.Aimbot then return end
     local closestPart = nil
@@ -493,17 +508,10 @@ local function AimbotFunction()
 
     if closestPart then
         local targetPos = closestPart.Position
-        if Hack.SilentAim then
-            -- Silent aim: thay đổi CFrame của Camera mượt mà (không giật)
-            local smooth = math.clamp(Hack.Smoothness, 0.001, 1)
-            local newLook = CFrame.new(Camera.CFrame.Position, targetPos).LookVector
-            local currentLook = Camera.CFrame.LookVector
-            local lerped = currentLook:Lerp(newLook, 1 - smooth)
-            Camera.CFrame = CFrame.new(Camera.CFrame.Position, Camera.CFrame.Position + lerped)
-        else
-            -- Lock cứng
-            Camera.CFrame = CFrame.new(Camera.CFrame.Position, targetPos)
-        end
+        local smooth = math.clamp(Hack.Smoothness, 0.001, 1)
+        local newLook = CFrame.new(Camera.CFrame.Position, targetPos).LookVector
+        local currentLook = Camera.CFrame.LookVector
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, Camera.CFrame.Position + currentLook:Lerp(newLook, 1 - smooth))
     end
 end
 
